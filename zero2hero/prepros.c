@@ -4,7 +4,7 @@
 int main()
 {
 #ifdef DEBUGGING
-    printf("we are in debugging mode status code %d\n", MAX_AGE);
+    printf("we are in debugging mode status code %d file: %s\n", MAX_AGE, __FILE__);
 #endif
     return 0;
 }
