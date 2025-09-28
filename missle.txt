@@ -1,0 +1,5 @@
+#start :gcc commands
+{
+    gcc -D<name> to define preprocesser
+}
+#end
