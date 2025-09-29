@@ -14,11 +14,10 @@ typedef struct
 } person_info_t;
 int setup_person(person_info_t p[])
 {
-
+    char name[4090];
     int check_buf_size = 256;
     for (int i = 0; i < MAX_IDS; i++)
     {
-        char name[4090];
         p[i].id = i * 5;
         if (p[i].id == 0)
         {
