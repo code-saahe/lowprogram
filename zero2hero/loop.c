@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #define MAX_PEOPLE 30
+
 int main()
 {
     /*
