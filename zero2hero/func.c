@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdbit.h>
 
 void print_binary_func()
 {
@@ -7,8 +6,9 @@ void print_binary_func()
     printf("%ld\n", let);
     return;
 }
-int main()
+int main(int argc, char **argv)
 {
     print_binary_func();
+    printf("%s\n", argv[1]);
     return 0;
 }
