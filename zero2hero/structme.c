@@ -18,20 +18,21 @@ int setup_person(person_info_t p[])
     int check_buf_size = 256;
     for (int i = 0; i < MAX_IDS; i++)
     {
-        char buf[256] = {0};
+        char name[4090];
         p[i].id = i * 5;
         if (p[i].id == 0)
         {
             p[i].id = 2 * 5;
         }
-        scanf("%s", buf);
-        if (strlen(buf) > check_buf_size)
+        scanf("%s", name);
+        if (strlen(name) > check_buf_size)
         {
             printf("you tried to commit a overflow but you failed\n");
             return -1;
             break;
         }
-        strcpy(p[i].name, buf);
+        strncpy(p[i].name, name, strlen(name));
+        memset(name, 0, sizeof(name));
     }
     return 0;
 }
@@ -50,7 +51,10 @@ void print_person_info(person_info_t p[])
 int main(int argc, char *argv[])
 {
     person_info_t person[MAX_IDS] = {0};
-    setup_person(person);
+    if (setup_person(person) == -1)
+    {
+        return -1;
+    }
     print_person_info(person);
     return 0;
 }
