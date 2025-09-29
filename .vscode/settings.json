@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "makefile": "cmake",
+        "Makefile": "makefile",
+        "stdbit.h": "c"
+    }
+}
