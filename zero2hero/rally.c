@@ -7,9 +7,11 @@ typedef enum
 } status_e;
 size_t resize_mem(int **arr, size_t new_size)
 {
-    int *temp = realloc(*arr, new_size * sizeof(int));
+    int *temp = NULL;
+    temp = realloc(*arr, new_size * sizeof(int));
     if (temp == NULL)
     {
+        *arr = NULL;
         printf("failed to reallacate memory\n");
         return STATUS_BAD;
     }
