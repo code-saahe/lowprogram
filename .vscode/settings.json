@@ -2,6 +2,7 @@
     "files.associations": {
         "makefile": "cmake",
         "Makefile": "makefile",
-        "stdbit.h": "c"
+        "stdbit.h": "c",
+        "fcntl.h": "c"
     }
 }
