@@ -1,80 +1,119 @@
 #include <stdio.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <stdbool.h>
 #include <getopt.h>
-#include "/mnt/d/lowlevel2/includes/common.h"
-#include "/mnt/d/lowlevel2/includes/file.h"
-#include "/mnt/d/lowlevel2/includes/parse.h"
+#include <stdlib.h>
 
-int print_usage(char *argv[])
+#include "/mnt/d/lowlevel2/include/common.h"
+#include "/mnt/d/lowlevel2/include/file.h"
+#include "/mnt/d/lowlevel2/include/parse.h"
+
+void print_usage(char *argv[])
 {
-    printf("Usage: %s -n -f <database file>\n", argv[0]);
-    printf("\t -n -create a new database file\n");
-    printf("\t -f -(required) path to database file\n");
-    return 0;
+	printf("Usage: %s -n -f <database file>\n", argv[0]);
+	printf("\t -n  - create new database file\n");
+	printf("\t -f  - (required) path to database file\n");
+	return;
 }
+
 int main(int argc, char *argv[])
 {
-    char *filepath = NULL;
-    bool newfile = false;
-    int c = 0;
-    int dbfd;
-    struct dbheader_t dbhdr = {0};
-    while ((c = getopt(argc, argv, "nf:")) != -1)
-    {
-        switch (c)
-        {
-        case 'n':
-            newfile = true;
-            break;
-        case 'f':
-            filepath = optarg;
-            break;
-        case '?':
-            printf("unknown option -%c\n", c);
-        default:
-            return -1;
-            break;
-        }
-    }
-    if (filepath == NULL)
-    {
-        printf("filepath is required argument\n");
-        print_usage(argv);
-        return 0;
-    }
-    if (newfile)
-    {
-        dbfd = create_db_file(filepath);
-        if (dbfd == STATUS_ERROR)
-        {
-            printf("unable to craate database file\n");
-            return -1;
-        }
-        if (create_dbheader(dbfd, &dbhdr) == STATUS_ERROR)
-        {
-            printf("failed to create db header file\n");
-            return -1;
-        }
-    }
-    else
-    {
-        dbfd = open_db_file(filepath);
-        if (dbfd == STATUS_ERROR)
-        {
-            printf("unable to open database file\n");
-            return -1;
-        }
-        if (validate_db_header(dbfd, &dbhdr) == STATUS_ERROR)
-        {
-            printf("failed to validate dbheadr\n");
-            return -1;
-        }
-    }
+	char *filepath = NULL;
+	char *portarg = NULL;
+	unsigned short port = 0;
+	bool newfile = false;
+	bool list = false;
+	char *addstring = NULL;
+	int c;
 
-    printf("Newfile %d\n", newfile);
-    printf("file path %s\n", filepath);
-    output_file(dbfd, &dbhdr);
-    return 0;
+	int dbfd = -1;
+	struct dbheader_t *dbhdr = NULL;
+	struct employee_t *employees = NULL;
+
+	while ((c = getopt(argc, argv, "nf:a:l")) != -1)
+	{
+		switch (c)
+		{
+		case 'n':
+			newfile = true;
+			break;
+		case 'f':
+			filepath = optarg;
+			break;
+		case 'p':
+			portarg = optarg;
+			break;
+		case 'a':
+			addstring = optarg;
+			break;
+		case 'l':
+			list = true;
+			break;
+		case '?':
+			printf("Unknown option -%c\n", c);
+			break;
+		default:
+			return -1;
+		}
+	}
+
+	if (filepath == NULL)
+	{
+		printf("Filepath is a required argument\n");
+		print_usage(argv);
+
+		return 0;
+	}
+
+	if (newfile)
+	{
+		dbfd = create_db_file(filepath);
+		if (dbfd == STATUS_ERROR)
+		{
+			printf("Unable to create database file\n");
+			return -1;
+		}
+
+		if (create_db_header(dbfd, &dbhdr) == STATUS_ERROR)
+		{
+			printf("Failed to create database header\n");
+			return -1;
+		}
+	}
+	else
+	{
+		dbfd = open_db_file(filepath);
+		if (dbfd == STATUS_ERROR)
+		{
+			printf("Unable to open database file\n");
+			return -1;
+		}
+
+		if (validate_db_header(dbfd, &dbhdr) == STATUS_ERROR)
+		{
+			printf("Failed to validate database header\n");
+			return -1;
+		}
+	}
+
+	if (read_employees(dbfd, dbhdr, &employees) != STATUS_SUCCESS)
+	{
+		printf("Failed to read employees");
+		return 0;
+	}
+
+	if (addstring)
+	{
+		dbhdr->count++;
+		employees = realloc(employees, dbhdr->count * (sizeof(struct employee_t)));
+		add_employee(dbhdr, employees, addstring);
+	}
+
+	if (list)
+	{
+		list_employees(dbhdr, employees);
+	}
+
+	output_file(dbfd, dbhdr, employees);
+
+	return 0;
 }
