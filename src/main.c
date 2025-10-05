@@ -5,6 +5,7 @@
 #include <getopt.h>
 #include "/mnt/d/lowlevel2/includes/common.h"
 #include "/mnt/d/lowlevel2/includes/file.h"
+#include "/mnt/d/lowlevel2/includes/parse.h"
 
 int print_usage(char *argv[])
 {
@@ -19,6 +20,7 @@ int main(int argc, char *argv[])
     bool newfile = false;
     int c = 0;
     int dbfd;
+    struct dbheader_t dbhdr = {0};
     while ((c = getopt(argc, argv, "nf:")) != -1)
     {
         switch (c)
@@ -47,21 +49,32 @@ int main(int argc, char *argv[])
         dbfd = create_db_file(filepath);
         if (dbfd == STATUS_ERROR)
         {
-            printf("unable to craate database file");
+            printf("unable to craate database file\n");
             return -1;
         }
-        else
+        if (create_dbheader(dbfd, &dbhdr) == STATUS_ERROR)
         {
-            dbfd = open_db_file(filepath);
-            if (dbfd == STATUS_ERROR)
-            {
-                printf("unable to open database file");
-                return -1;
-            }
+            printf("failed to create db header file\n");
+            return -1;
+        }
+    }
+    else
+    {
+        dbfd = open_db_file(filepath);
+        if (dbfd == STATUS_ERROR)
+        {
+            printf("unable to open database file\n");
+            return -1;
+        }
+        if (validate_db_header(dbfd, &dbhdr) == STATUS_ERROR)
+        {
+            printf("failed to validate dbheadr\n");
+            return -1;
         }
     }
 
     printf("Newfile %d\n", newfile);
     printf("file path %s\n", filepath);
+    output_file(dbfd, &dbhdr);
     return 0;
 }

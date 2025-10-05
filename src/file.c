@@ -11,7 +11,7 @@ int create_db_file(char *filename)
     {
         perror("open");
         close(fd);
-        printf("file already exit\n");
+        printf("file already exsit\n");
         return STATUS_ERROR;
     }
     fd = open(filename, O_RDWR | O_CREAT, 0644);
@@ -29,7 +29,7 @@ int open_db_file(char *filename)
     if (fd == -1)
     {
         perror("open");
-        printf("failed to open file");
+        printf("failed to open file\n");
         return STATUS_ERROR;
     }
     return fd;
